@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- CSS only -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+        <title>Catalogo - filmes</title>
+        <script src="xmltojson.js"></script>
+        <script>
+            function getFilmes() {
+                //nova requisição de servidor HTML
+                let xmlHttp = new XMLHttpRequest();
+                //Pelo método GET abre o diretório \/
+                xmlHttp.open('GET', 'http://localhost/ajax/cat_film/filmes.json')
+                //Se a resposta da requisição for FINALIZADA e ENCONTRADA
+                xmlHttp.onreadystatechange = () => {
+                    if(xmlHttp.readyState == 4 && xmlHttp.status == 200){
+                        //CAPTURA a resposta da requisição feita anteriormente e agrega a uma VAR
+                        let JSONFilmes = xmlHttp.responseText;
+                        //transforma a biblioteca JSON em um array atravéz da função >>> JSON.parse <<<
+                        let objJsonFilmes = JSON.parse(JSONFilmes)
+                        console.log(objJsonFilmes)
+
+                        /*
+                        // console.log(XMLFilmes)
+                        let parcer = new DOMParser()
+                        domFilmes = parcer.parseFromString(XMLFilmes, 'text/xml')
+                        
+                        // console.log(domFilmes)
+                        jsonFilmes = xmlToJson(domFilmes)
+                        */
+                        //Rastreia os arrays DENTRO DE Filmes > Filme (NO CASO SÃO 2)
+                        
+                        for(let i in objJsonFilmes.filmes){
+                            //Simplifica todo o comando para uma variavel
+                            let item = objJsonFilmes.filmes[i]
+
+                            let divRow = document.createElement('div')
+                            divRow.className = 'row';
+
+                            let divCol = document.createElement('div')
+                            divCol.className = 'col';
+
+                            let p1 = document.createElement('p');
+                            p1.innerHTML = '<strong>Titulo: </strong>' + item.titulo;
+
+                            let p2 = document.createElement('p');
+                            p2.innerHTML = '<strong>Resumo: </strong>' + item.resumo
+
+                            let p3 = document.createElement('p');
+
+                            let generos = ''
+                            //RASTREIA todos os arrays em genero dentro de item
+                            for(let g in item.generos){
+
+                                //Quando genero tiver um valor, concatena o resultado com , e espaço
+                                if(generos) generos += ', '
+                                   
+                                //Faz com que genero receba todos os textos que estavam dentro
+                                //do rastreamento da Array por [G]
+                                generos += item.generos[g].genero
+                            }
+                            p3.innerHTML = '<strong>Genero: </strong>' + generos;
+
+                            let p4 = document.createElement('p');
+                            // Letra (E) será o rastreamento dos arrays dentro de item > elenco > ator !!!
+                            let elenco = ''
+                            for(let e in item.elenco){
+                                elenco += item.elenco[e].ator;
+                                if(elenco) elenco += ', ';
+                            }
+                            p4.innerHTML = '<strong>Elenco: </strong>' + elenco
+                            
+                            let p5 = document.createElement('p');
+
+                            p5.innerHTML = '<strong>Data de Lançamento: </strong>' + item.dataLancamento.data + ' (' + item.dataLancamento.pais + ')';
+
+                            let hr = document.createElement('hr');
+
+                            divRow.appendChild(divCol);
+                            divCol.appendChild(p1);
+                            divCol.appendChild(p2);
+                            divCol.appendChild(p3);
+                            divCol.appendChild(p4);
+                            divCol.appendChild(p5);
+                            divCol.appendChild(hr);
+
+                            document.getElementById('lista').appendChild(divRow)
+
+                            
+                        }
+                        
+                    }
+                    if(xmlHttp.readyState == 4 && xmlHttp.status == 404){
+                        //..
+                    }
+                }
+                xmlHttp.send()
+            }
+        </script>
+    </head>
+    <body>
+        <nav class="navbar navbar-light bg-light mb-4">
+            <div class="container">
+                <div class="navbar-brand mb-0 h1">
+                    <h3>Catálogo de filmes</h3>
+                </div>
+            </div>
+        </nav>
+        <div class="container" id="lista">
+            <div class="row">
+                <div class="col" >
+                    <button type="button" id="botao" class="btn btn-success mb-5" onclick="getFilmes()">Listar filmes</button>
+                </div>
+            </div>          
+        </div>
+    </body>
+</html>
